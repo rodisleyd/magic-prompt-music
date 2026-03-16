@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-white text-zinc-900 antialiased min-h-screen;
+    font-family: var(--font-sans);
+  }
+}
+
+@layer components {
+  .input-label {
+    @apply text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 block;
+  }
+
+  .input-field {
+    @apply w-full px-5 py-4 rounded-2xl bg-white border border-zinc-200 focus:outline-none focus:border-zinc-400 transition-all duration-300;
+  }
+  
+  .btn-gray {
+    @apply w-full py-5 bg-zinc-200 hover:bg-zinc-300 text-zinc-600 font-bold uppercase tracking-widest text-[11px] rounded-xl transition-all duration-300 flex items-center justify-center gap-2;
+  }
+
+  .btn-outline {
+    @apply px-12 py-3 bg-white border border-zinc-200 hover:border-zinc-400 text-zinc-600 font-bold uppercase tracking-widest text-[11px] rounded-xl transition-all duration-300;
+  }
+
+  .output-area {
+    @apply w-full h-96 p-8 border border-zinc-200 rounded-3xl bg-white text-zinc-700 font-medium leading-relaxed resize-none focus:outline-none focus:border-zinc-300 transition-all;
+  }
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
