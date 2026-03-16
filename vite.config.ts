@@ -23,19 +23,19 @@ export default defineConfig(({mode}) => {
           icons: [
             {
               src: 'favicon.png',
-              sizes: '192x192 512x512 515x516',
+              sizes: 'any',
               type: 'image/png',
               purpose: 'any'
             },
             {
               src: 'icone_magic_prompt.png',
-              sizes: '512x512 515x516',
+              sizes: '512x512',
               type: 'image/png',
               purpose: 'any'
             },
             {
               src: 'icone_magic_prompt.png',
-              sizes: '512x512 515x516',
+              sizes: '512x512',
               type: 'image/png',
               purpose: 'maskable'
             }
