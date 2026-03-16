@@ -22,20 +22,22 @@ export default defineConfig(({mode}) => {
           display: 'standalone',
           icons: [
             {
-              src: '/favicon.png',
-              sizes: '192x192',
-              type: 'image/png'
-            },
-            {
-              src: '/icone_magic_prompt.png',
-              sizes: '512x512',
-              type: 'image/png'
-            },
-            {
-              src: '/icone_magic_prompt.png',
-              sizes: '512x512',
+              src: 'favicon.png',
+              sizes: '192x192 512x512 515x516',
               type: 'image/png',
-              purpose: 'any maskable'
+              purpose: 'any'
+            },
+            {
+              src: 'icone_magic_prompt.png',
+              sizes: '512x512 515x516',
+              type: 'image/png',
+              purpose: 'any'
+            },
+            {
+              src: 'icone_magic_prompt.png',
+              sizes: '512x512 515x516',
+              type: 'image/png',
+              purpose: 'maskable'
             }
           ]
         }
