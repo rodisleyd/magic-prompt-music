@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { MusicAnalysis } from "./types";
+import { MusicAnalysis, VocalSettings } from "../types";
 
 const apiKey = process.env.GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -8,43 +8,56 @@ export async function generateMusicPrompt(
   songName: string,
   artistName: string,
   audioFile?: { data: string; mimeType: string },
-  fileName?: string
+  fileName?: string,
+  voiceTimbre?: string,
+  vocalSettings?: VocalSettings,
+  additionalInstruments?: string[]
 ): Promise<MusicAnalysis> {
-  console.log("Generating prompt for:", songName, artistName, fileName);
+  console.log("Generating prompt for:", songName, artistName, fileName, voiceTimbre, vocalSettings);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.0-flash",
     generationConfig: {
       responseMimeType: "application/json",
     },
     systemInstruction: `Você é um Engenheiro de Prompts especialista para Suno AI e Udio.
-    Sua missão é realizar uma análise técnica de uma música e gerar um prompt mestre seguir estas diretrizes:
+    Sua missão é realizar uma análise profunda e emocional de uma música para gerar um "Master Prompt" que capture não apenas sua técnica, mas sua "alma" e progressão.
 
-    1. O resultado final (campo "finalPrompt") deve ser um ÚNICO PARÁGRAFO fluido, inteiramente em INGLÊS.
-    2. Este parágrafo deve sintetizar: BPM, estilo da bateria/ritmo, tipo de baixo, instrumentos harmônicos, estilo vocal e detalhes de produção/mixagem.
-    3. CRÍTICO: Nunca mencione o nome do artista, da banda ou o título da música DENTRO do "finalPrompt".
-    4. NÃO USE numeração ou marcadores.
-    5. O arquivo de áudio MP3 é SUFICIENTE por si só para a geração. Não é obrigatório que o usuário forneça o nome da música ou artista. 
-    6. Se o nome da música (songName) vier vazio e houver um nome de arquivo fornecido, use o nome do arquivo (removendo a extensão .mp3) como título da música.
-    7. Se tanto o nome da música quanto o nome do arquivo estiverem ausentes, use o áudio para tentar identificá-lo.
-    8. CRÍTICO: Nunca tente identificar, adivinhar ou preencher o nome do artista/banda (artistName) a partir do áudio. Deixe este campo vazio ou use "" se o usuário não o forneceu. 
+    DIRETRIZES DO PROMPT FINAL (campo "finalPrompt"):
+    1. IDIOMA: Deve ser inteiramente em INGLÊS, em um único parágrafo fluido.
+    2. NARRATIVA E ESTRUTURA: Descreva a JORNADA da música. Comece descrevendo como ela se inicia (ex: "Starts with a soft acoustic intro"), como ela evolui (ex: "gradually builds tension"), e como é o seu clímax.
+    3. ESSÊNCIA E MOOD: Use adjetivos que descrevam a atmosfera (ex: nostalgic, aggressive, ethereal, melancholic, anthemic, raw).
+    4. DETALHES TÉCNICOS INTEGRADOS: Insira naturalmente detalhes de BPM, escala, estilo de bateria, baixo e produção, mas como parte da descrição musical, não como uma lista isolada.
+    5. VOZ E DNA: Se houver configurações de voz (DNA Vocal), use-as para descrever a performance vocal com precisão emocional (ex: "strained, high-intensity vocals" para alta tensão).
+    6. INSTRUMENTAÇÃO: Dê destaque a técnicas específicas (Slap bass, fingerstyle guitar, power chords) se elas definirem a música.
+    7. REGRAS CRÍTICAS: 
+       - NUNCA mencione o nome do artista, da banda ou o título da música no "finalPrompt".
+       - NÃO use tópicos ou listas; mantenha um fluxo contínuo e descritivo.
+       - Foque na DINÂMICA (o que muda ao longo da música).
 
-    Campos a preencher no JSON:
-    - songName: Nome da música identificado ou extraído do nome do arquivo (se não fornecido pelo usuário).
-    - artistName: DEIXAR VAZIO ("") a menos que o usuário tenha fornecido este nome no texto de entrada.
-    - bpm: BPM da música (apenas número/texto curto).
-    - drums: Descrição da bateria.
-    - drumsSummary: Resumo curto.
-    - bass: Descrição do baixo.
-    - harmony: Descrição da harmonia.
-    - vocals: Descrição da voz.
-    - production: Ambiência e mix.
-    - finalPrompt: O parágrafo mestre em INGLÊS sintetizando tudo acima (sem nomes próprios).
-
-    Retorne estritamente um JSON com esses campos.`,
+    REGRAS DE RETORNO:
+    Retorne estritamente um JSON com os campos: songName, artistName, bpm, scale, drums, drumsSummary, bass, harmony, vocals, production, finalPrompt.`,
   });
 
+  const settingsPrompt = vocalSettings ? `
+    Vocal Studio Settings:
+    - Archetype: ${vocalSettings.archetype}
+    - Raspy: ${vocalSettings.raspy}/100
+    - Tension: ${vocalSettings.tension}/100
+    - Expressiveness: ${vocalSettings.expressiveness}/100
+    - Imperfection: ${vocalSettings.imperfection}/100
+    - Breathiness: ${vocalSettings.breathiness}/100
+    - Brightness: ${vocalSettings.brightness}/100
+    - Polish: ${vocalSettings.polish}/100
+    - Ambience: ${vocalSettings.ambience}
+    - Analog Warmth: ${vocalSettings.analogWarmth ? 'Yes' : 'No'}
+  ` : '';
+
+  const extraPrompt = `
+    Additional Instruments & Techniques to Include: ${additionalInstruments?.length ? additionalInstruments.join(", ") : "None"}
+  `;
+
   const generateResult = await model.generateContent([
-    { text: `Música: ${songName}\nArtista: ${artistName}\nArquivo: ${fileName || "Nenhum"}` },
+    { text: `Música: ${songName}\nArtista: ${artistName}\nTimbre de Voz Desejado: ${voiceTimbre || "Não especificado"}${settingsPrompt}${extraPrompt}\nArquivo: ${fileName || "Nenhum"}` },
     ...(audioFile ? [{ inlineData: audioFile }] : []),
   ]);
 
